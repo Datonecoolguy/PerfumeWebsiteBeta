@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NanaPerfume - Hexagonal Fragrance Finder</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        :root {
+            --primary-purple: #8e44ad;
+            --light-purple: #d2b4de;
+            --gold: #f39c12;
+            --light-gold: #fdebd0;
+            --dark-text: #333;
+            --light-text: #fff;
+            --success-green: #2ecc71;
+            --error-red: #e74c3c;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: var(--dark-text);
+        }
+        
+        header {
+            background-color: var(--primary-purple);
+            color: var(--light-text);
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 5px solid var(--gold);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+        }
+        
+        .site-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .tagline {
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+        
+        nav {
+            background-color: var(--light-purple);
+            display: flex;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav a {
+            color: var(--dark-text);
+            text-decoration: none;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        nav a:hover {
+            background-color: var(--gold);
+        }
+        
+        .hero {
+            background-color: var(--light-gold);
+            padding: 3rem 1rem;
+            text-align: center;
+        }
+        
+        .hero h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-purple);
+        }
+        
+        .hero p {
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background-color: var(--gold);
+            color: var(--dark-text);
+            padding: 0.75rem 1.5rem;
+            margin-top: 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            border: 2px solid var(--primary-purple);
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            background-color: var(--primary-purple);
+            color: var(--light-text);
+        }
+        
+        .features {
+            padding: 3rem 1rem;
+            background-color: #fff;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            color: var(--primary-purple);
+        }
+        
+        .feature-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .feature-card {
+            background-color: var(--light-purple);
+            border-radius: 8px;
+            padding: 1.5rem;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-purple);
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card p {
+            line-height: 1.5;
+        }
+        
+        /* Fragrance Finder Styles */
+        .fragrance-finder {
+            padding: 3rem 1rem;
+            background-color: #fff;
+        }
+        
+        .finder-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        
+        .finder-form {
+            flex: 1;
+            min-width: 300px;
+            background-color: var(--light-gold);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .finder-results {
+            flex: 1;
+            min-width: 300px;
+            background-color: var(--light-purple);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .fragrance-form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .fragrance-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .scent-sliders {
+            margin-top: 1rem;
+        }
+        
+        .scent-slider {
+            margin-bottom: 1rem;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .slider-container input {
+            flex: 1;
+        }
+        
+        .slider-value {
+            min-width: 30px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .find-btn {
+            background-color: var(--primary-purple);
+            color: var(--light-text);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            width: 100%;
+        }
+        
+        .find-btn:hover {
+            background-color: var(--gold);
+            color: var(--dark-text);
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        #recommendations {
+            margin-top: 2rem;
+        }
+        
+        #recommendations h4 {
+            color: var(--primary-purple);
+            margin-bottom: 0.5rem;
+        }
+        
+        .recommendation-item {
+            background-color: white;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .recommendation-icon {
+            font-size: 1.5rem;
+        }
+        
+        .recommendation-details h5 {
+            margin: 0 0 5px 0;
+            color: var(--primary-purple);
+        }
+        
+        .recommendation-details p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        
+        footer {
+            background-color: var(--primary-purple);
+            color: var(--light-text);
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 5px solid var(--gold);
+            margin-top: 2rem;
+        }
+        
+        .footer-links {
+            margin: 1rem 0;
+        }
+        
+        .footer-links a {
+            color: var(--light-gold);
+            margin: 0 0.5rem;
+            text-decoration: none;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .feature-cards {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .finder-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-icon">💐</div>
+            <h1 class="site-title">NanaPerfume</h1>
+        </div>
+        <p class="tagline">Discover Your Signature Scent</p>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#features">Collections</a></li>
+            <li><a href="#finder">Fragrance Finder</a></li>
+        </ul>
+    </nav>
+    
+    <section id="home" class="hero">
+        <h2>Welcome to NanaPerfume Boutique</h2>
+        <p>Your ultimate destination for exquisite fragrances that tell your story. Explore our curated collection of premium perfumes, discover new scents, and find the perfect fragrance that resonates with your personality.</p>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSdWB5Qhzet-KE0LRztlQkMHnpqfQBprXeRbm_RTKxNZjyVNvg/viewform?usp=dialog" class="cta-button" target="_blank">Shop Refills Now</a>
+    </section>
+    
+    <section id="features" class="features">
+        <h2 class="section-title">Our Collections</h2>
+        <div class="feature-cards">
+            <div class="feature-card">
+                <div class="feature-icon">🌸</div>
+                <h3>Floral Collection</h3>
+                <p>Delicate and enchanting floral notes that evoke the beauty of blooming gardens and natural elegance.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌲</div>
+                <h3>Woody Collection</h3>
+                <p>Rich and warm woody fragrances that create a sense of comfort and sophistication for any occasion.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🍊</div>
+                <h3>Citrus Collection</h3>
+                <p>Bright and invigorating citrus scents that refresh your senses and elevate your mood throughout the day.</p>
+            </div>
+        </div>
+    </section>
+    
+    <section id="finder" class="fragrance-finder">
+        <h2 class="section-title">Hexagonal Fragrance Finder</h2>
+        <div class="finder-container">
+            <div class="finder-form">
+                <h3>Find Your Perfect Scent</h3>
+                <form id="fragranceFinderForm">
+                    <div class="fragrance-form-group">
+                        <label for="occasion">Occasion</label>
+                        <select id="occasion" class="fragrance-select">
+                            <option value="everyday">Everyday</option>
+                            <option value="evening">Evening</option>
+                            <option value="special">Special Occasion</option>
+                            <option value="work">Work</option>
+                        </select>
+                    </div>
+                    
+                    <div class="fragrance-form-group">
+                        <label for="season">Season</label>
+                        <select id="season" class="fragrance-select">
+                            <option value="spring">Spring</option>
+                            <option value="summer">Summer</option>
+                            <option value="autumn">Autumn</option>
+                            <option value="winter">Winter</option>
+                        </select>
+                    </div>
+                    
+                    <div class="fragrance-form-group">
+                        <label>Scent Preferences</label>
+                        <div class="scent-sliders">
+                            <div class="scent-slider">
+                                <label>Floral</label>
+                                <div class="slider-container">
+                                    <input type="range" min="0" max="10" value="5" class="scent-range" id="floralRange">
+                                    <span class="slider-value" id="floralValue">5</span>
+                                </div>
+                            </div>
+                            
+                            <div class="scent-slider">
+                                <label>Woody</label>
+                                <div class="slider-container">
+                                    <input type="range" min="0" max="10" value="5" class="scent-range" id="woodyRange">
+                                    <span class="slider-value" id="woodyValue">5</span>
+                                </div>
+                            </div>
+                            
+                            <div class="scent-slider">
+                                <label>Citrus</label>
+                                <div class="slider-container">
+                                    <input type="range" min="0" max="10" value="5" class="scent-range" id="citrusRange">
+                                    <span class="slider-value" id="citrusValue">5</span>
+                                </div>
+                            </div>
+                            
+                            <div class="scent-slider">
+                                <label>Sweet</label>
+                                <div class="slider-container">
+                                    <input type="range" min="0" max="10" value="5" class="scent-range" id="sweetRange">
+                                    <span class="slider-value" id="sweetValue">5</span>
+                                </div>
+                            </div>
+                            
+                            <div class="scent-slider">
+                                <label>Spicy</label>
+                                <div class="slider-container">
+                                    <input type="range" min="0" max="10" value="5" class="scent-range" id="spicyRange">
+                                    <span class="slider-value" id="spicyValue">5</span>
+                                </div>
+                            </div>
+                            
+                            <div class="scent-slider">
+                                <label>Oriental</label>
+                                <div class="slider-container">
+                                    <input type="range" min="0" max="10" value="5" class="scent-range" id="orientalRange">
+                                    <span class="slider-value" id="orientalValue">5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="find-btn" id="findFragranceBtn">Find My Fragrance</button>
+                </form>
+            </div>
+            
+            <div class="finder-results">
+                <h3>Your Fragrance Profile</h3>
+                <div class="chart-container">
+                    <canvas id="fragranceHexChart"></canvas>
+                </div>
+                <div id="recommendations">
+                    <h4>Recommended Fragrances</h4>
+                    <div id="recommendationsList">
+                        <p>Adjust your preferences and click "Find My Fragrance" to see recommendations.</p>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdWB5Qhzet-KE0LRztlQkMHnpqfQBprXeRbm_RTKxNZjyVNvg/viewform?usp=dialog" class="cta-button" target="_blank">Order Your Perfect Scent</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <p>&copy; 2025 NanaPerfume Boutique. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">FAQ</a>
+            <a href="#">Contact Us</a>
+        </div>
+    </footer>
+
+    <script>
+        // Update range slider values
+        document.querySelectorAll('.scent-range').forEach(range => {
+            range.addEventListener('input', function() {
+                document.getElementById(this.id.replace('Range', 'Value')).textContent = this.value;
+            });
+        });
+        
+        // Create hexagonal chart (radar chart with 6 points)
+        const hexCtx = document.getElementById('fragranceHexChart').getContext('2d');
+        let fragranceHexChart = new Chart(hexCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Floral', 'Woody', 'Citrus', 'Sweet', 'Spicy', 'Oriental'],
+                datasets: [{
+                    label: 'Your Preferences',
+                    data: [5, 5, 5, 5, 5, 5],
+                    backgroundColor: 'rgba(142, 68, 173, 0.2)',
+                    borderColor: 'rgba(142, 68, 173, 1)',
+                    pointBackgroundColor: 'rgba(142, 68, 173, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(142, 68, 173, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        angleLines: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.1)', 
+                        },
+                        ticks: {
+                            backdropColor: 'transparent',
+                            showLabelBackdrop: false,
+                            display: false
+                        },
+                        pointLabels: {
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            color: '#333'
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 10
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                elements: {
+                    line: {
+                        tension: 0.2 // Slightly smoother lines
+                    }
+                }
+            }
+        });
+        
+        // Recommendations based on fragrance profile
+        const perfumeDatabase = [
+            { name: "Mystic Bloom", icon: "🌸", description: "Delicate floral with rose and jasmine notes", profile: [9, 2, 3, 6, 1, 4] },
+            { name: "Amber Woods", icon: "🌲", description: "Rich woody fragrance with amber and sandalwood", profile: [2, 9, 1, 3, 5, 7] },
+            { name: "Citrus Zest", icon: "🍊", description: "Fresh citrus blend with bergamot and lemon", profile: [1, 2, 9, 4, 1, 2] },
+            { name: "Velvet Rose", icon: "🌹", description: "Luxurious rose with vanilla and amber", profile: [8, 3, 1, 7, 2, 6] },
+            { name: "Spice Market", icon: "✨", description: "Exotic blend of spices with warm vanilla", profile: [2, 4, 1, 5, 9, 7] },
+            { name: "Oriental Night", icon: "🌙", description: "Sensual oriental with exotic florals", profile: [5, 3, 1, 4, 6, 9] }
+        ];
+        
+        document.getElementById('findFragranceBtn').addEventListener('click', function() {
+            // Get values from all sliders
+            const floralValue = parseInt(document.getElementById('floralRange').value);
+            const woodyValue = parseInt(document.getElementById('woodyRange').value);
+            const citrusValue = parseInt(document.getElementById('citrusRange').value);
+            const sweetValue = parseInt(document.getElementById('sweetRange').value);
+            const spicyValue = parseInt(document.getElementById('spicyRange').value);
+            const orientalValue = parseInt(document.getElementById('orientalRange').value);
+            
+            // Update chart with new values
+            fragranceHexChart.data.datasets[0].data = [floralValue, woodyValue, citrusValue, sweetValue, spicyValue, orientalValue];
+            fragranceHexChart.update();
+            
+            // Calculate recommendations
+            const userProfile = [floralValue, woodyValue, citrusValue, sweetValue, spicyValue, orientalValue];
+            const recommendations = findRecommendations(userProfile);
+            
+            // Display recommendations
+            displayRecommendations(recommendations);
+        });
+        
+        function findRecommendations(userProfile) {
+            // Calculate similarity between user profile and perfume profiles
+            return perfumeDatabase.map(perfume => {
+                // Calculate Euclidean distance (smaller is better)
+                let distance = 0;
+                for (let i = 0; i < userProfile.length; i++) {
+                    distance += Math.pow(userProfile[i] - perfume.profile[i], 2);
+                }
+                distance = Math.sqrt(distance);
+                
+                return {
+                    perfume: perfume,
+                    distance: distance
+                };
+            })
+            .sort((a, b) => a.distance - b.distance) // Sort by similarity (closest first)
+            .slice(0, 3); // Top 3 recommendations
+        }
+        
+        function displayRecommendations(recommendations) {
+            const recommendationsList = document.getElementById('recommendationsList');
+            recommendationsList.innerHTML = ''; // Clear previous recommendations
+            
+            recommendations.forEach(rec => {
+                const item = document.createElement('div');
+                item.className = 'recommendation-item';
+                
+                item.innerHTML = `
+                    <div class="recommendation-icon">${rec.perfume.icon}</div>
+                    <div class="recommendation-details">
+                        <h5>${rec.perfume.name}</h5>
+                        <p>${rec.perfume.description}</p>
+                    </div>
+                `;
+                
+                recommendationsList.appendChild(item);
+            });
+        }
+    </script>
+</body>
+</html>
